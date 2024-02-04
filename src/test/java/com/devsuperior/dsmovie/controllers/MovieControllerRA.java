@@ -123,6 +123,19 @@ public class MovieControllerRA {
 	
 	@Test
 	public void insertShouldReturnForbiddenWhenClientLogged() throws Exception {
+
+		JSONObject newProduct = new JSONObject(postMovieInstance);
+
+		given()
+				.header("Content-type", "application/json")
+				.header("Authorization", "Bearer " + clientToken)
+				.body(newProduct)
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.when()
+				.post("/movies")
+				.then()
+				.statusCode(403);
 	}
 	
 	@Test
