@@ -140,5 +140,18 @@ public class MovieControllerRA {
 	
 	@Test
 	public void insertShouldReturnUnauthorizedWhenInvalidToken() throws Exception {
+
+		JSONObject newProduct = new JSONObject(postMovieInstance);
+
+		given()
+				.header("Content-type", "application/json")
+				.header("Authorization", "Bearer " + invalidToken)
+				.body(newProduct)
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.when()
+				.post("/movies")
+				.then()
+				.statusCode(401);
 	}
 }
