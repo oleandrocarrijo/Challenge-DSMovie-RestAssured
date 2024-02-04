@@ -10,12 +10,9 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static  org.hamcrest.Matchers.*;
+import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.*;
 
 public class MovieControllerRA {
 
