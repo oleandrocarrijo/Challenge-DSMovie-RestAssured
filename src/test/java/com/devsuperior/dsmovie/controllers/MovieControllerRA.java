@@ -1,8 +1,14 @@
 package com.devsuperior.dsmovie.controllers;
 
+import com.devsuperior.dsmovie.tests.TokenUtil;
+import io.restassured.http.ContentType;
 import org.json.JSONException;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static io.restassured.matcher.RestAssuredMatchers.*;
@@ -15,15 +21,35 @@ public class MovieControllerRA {
 
 	private String movieName;
 	private Long existingMovieId, nonExistingMovieId;
+	private String adminToken, clientToken, invalidToken;
+	private String clientUsername, clientPassword, adminUsername, adminPassword;
+
+	private Map<String, Object> postMovieInstance;
 
 	@BeforeEach
 	void setup() throws JSONException{
 		baseURI = "http://localhost:8080";
 
+		clientUsername = "ana@gmail.com";
+		clientPassword = "123456";
+		adminUsername = "maria@gmail.com";
+		adminPassword = "123456";
+
+		clientToken = TokenUtil.obtainAccessToken(clientUsername, clientPassword);
+		adminToken = TokenUtil.obtainAccessToken(adminUsername, adminPassword);
+		invalidToken = adminToken.concat("xpto");
+
 		movieName = "Matrix Resurrections";
 
 		existingMovieId = 1L;
 		nonExistingMovieId = 150L;
+
+		postMovieInstance = new HashMap<>();
+		postMovieInstance.put("title", "Test Movie");
+		postMovieInstance.put("score", 0.0);
+		postMovieInstance.put("count", 0);
+		postMovieInstance.put("image", "https://www.themoviedb.org/t/p/w533_and_h300_bestv2/" +
+				"jBJWaqoSCiARWtfV0GlqHrcdidd.jpg");
 	}
 
 	@Test
@@ -76,7 +102,23 @@ public class MovieControllerRA {
 	}
 	
 	@Test
-	public void insertShouldReturnUnprocessableEntityWhenAdminLoggedAndBlankTitle() throws JSONException {		
+	public void insertShouldReturnUnprocessableEntityWhenAdminLoggedAndBlankTitle() throws JSONException {
+
+		postMovieInstance.put("title", "");
+		JSONObject newProduct = new JSONObject(postMovieInstance);
+
+		given()
+				.header("Content-type", "application/json")
+				.header("Authorization", "Bearer " + adminToken)
+				.body(newProduct)
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON)
+				.when()
+				.post("/movies")
+				.then()
+				.statusCode(422)
+				.body("errors.message[0]", equalTo("Campo requerido"))
+				.body("errors.message[1]", equalTo("Tamanho deve ser entre 5 e 80 caracteres"));
 	}
 	
 	@Test
