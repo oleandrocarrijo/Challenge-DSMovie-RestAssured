@@ -7,18 +7,23 @@ import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.*;
 import static io.restassured.matcher.RestAssuredMatchers.*;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static  org.hamcrest.Matchers.*;
 
 public class MovieControllerRA {
 
 	private String movieName;
+	private Long existingMovieId, nonExistingMovieId;
 
 	@BeforeEach
 	void setup() throws JSONException{
 		baseURI = "http://localhost:8080";
 
 		movieName = "Matrix Resurrections";
+
+		existingMovieId = 1L;
+		nonExistingMovieId = 150L;
 	}
 
 	@Test
@@ -46,7 +51,18 @@ public class MovieControllerRA {
 	}
 	
 	@Test
-	public void findByIdShouldReturnMovieWhenIdExists() {		
+	public void findByIdShouldReturnMovieWhenIdExists() {
+
+		given()
+				.get("/movies/{id}", existingMovieId)
+				.then()
+				.statusCode(200)
+				.body("id", is(1))
+				.body("title", equalTo("The Witcher"))
+				.body("score", is(4.5F))
+				.body("count", is(2))
+				.body("image", equalTo("https://www.themoviedb.org/t/p/w533_and_h300_bestv2/jBJWaqoSCiARWtfV0GlqHrcdidd.jpg"));
+
 	}
 	
 	@Test
